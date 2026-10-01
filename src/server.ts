@@ -17,7 +17,9 @@ createServer((req, res) => {
       }
     }
     const path = new URL(req.url ?? "/", "http://x").pathname
-    const { status, body: out } = handle(req.method ?? "GET", path, body, { now: new Date() })
+    // Socket address only: X-Forwarded-For is client-controlled and not trusted (see spec, out of scope).
+    const ctx = { now: new Date(), ip: req.socket.remoteAddress }
+    const { status, body: out } = handle(req.method ?? "GET", path, body, ctx)
     res.writeHead(status, { "content-type": "application/json; charset=utf-8" }).end(JSON.stringify(out))
   })
 }).listen(port, () => console.log(`น้ำท่วมไหม listening on http://localhost:${port}`))
